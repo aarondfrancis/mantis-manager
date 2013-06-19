@@ -4,7 +4,7 @@
  * 
  */
 
-class AssetsCommand extends CConsoleCommand {
+class MantisCommand extends CConsoleCommand {
 	public function actionIndex($type='local'){
 		if($type !== 'local' && $type !== 'remote'){
 			echo "Option --type must be either local or remote. \r\n";
