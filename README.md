@@ -3,6 +3,7 @@ Mantis Asset Manager
 
 Warning: This will likely take a bit of tweaking to get plugged into your system, but it is totally worth it when you do.
 
+For a less-technical explanation, head over to [http://aaronfrancis.com/blog/2013/6/19/yii-and-the-asset-pipeline-part-2](http://aaronfrancis.com/blog/2013/6/19/yii-and-the-asset-pipeline-part-2).
 
 ![Mantis Asset Manager](protected/assets/images/mantis-manager.png?raw=true)
 
