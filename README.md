@@ -4,7 +4,7 @@ Mantis Asset Manager
 Warning: This will likely take a bit of tweaking to get plugged into your system, but it is totally worth it when you do.
 
 
-![Mantis Asset Manager](protected/assets/iamges/mantis-manager.png?raw=true)
+![Mantis Asset Manager](protected/assets/images/mantis-manager.png?raw=true)
 
 -----------	
 ### History
