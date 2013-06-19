@@ -10,8 +10,6 @@ define('ENVIRONMENT', $env);
 $env = require(dirname(__FILE__) . '/env/' . ENVIRONMENT . '/console.php');
 
 return array_merge_recursive($env, array(
-	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'../',
-
 	// preloading 'log' component
 	'preload'=>array('log'),
 

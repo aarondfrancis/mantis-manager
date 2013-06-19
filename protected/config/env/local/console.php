@@ -7,13 +7,6 @@ return array(
 
 	// application components
 	'components'=>array(
-		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=getmantis',
-			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => 'root',
-			'charset' => 'utf8',
-		),
 		'localAssets'=>array(
 			'class' => 'CAssetManager',
 			'basePath' => Yii::getPathOfAlias('application') . '../assets',
