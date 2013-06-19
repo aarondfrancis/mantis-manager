@@ -28,18 +28,18 @@ class MantisManager extends CApplicationComponent {
 		$this->_assetsPath = Yii::getPathOfAlias($this->assetsPath);
 
 
-		$this->ignore = Helpers::extend(array(
+		$this->ignore = $this->extend(array(
 			// ignore hidden files
 			'.*',
 			'*/.*'
 		), $this->ignore);
 
-		$this->css = Helpers::extend(array(
+		$this->css = $this->extend(array(
 			'combine' => array(),
 			'minify' => true
 		), $this->css);
 
-		$this->js = Helpers::extend(array(
+		$this->js = $this->extend(array(
 			'combine' => array(),
 			'minify' => true
 		), $this->js);
@@ -345,6 +345,19 @@ class MantisManager extends CApplicationComponent {
 			if (!$this->deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) return false;
 		}
 		return rmdir($dir);
+	}
+
+	private function extend($defaults = array(), $input = array()){
+		if(isset($input)){
+			foreach($defaults as $key=>$value){
+				if(!array_key_exists($key, $input)){
+					$input[$key] = $value;
+				}
+			}
+		}else{
+			$input = $defaults;
+		}
+		return $input;
 	}
 }
 

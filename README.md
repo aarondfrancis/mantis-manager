@@ -3,7 +3,7 @@ Mantis Asset Manager
 
 Warning: This will likely take a bit of tweaking to get plugged into your system, but it is totally worth it when you do.
 
------------
+-----------	
 ### History
 The Mantis Asset Manager is a system for the PHP framework Yii that minifies, combines, and publishes files. This is *not* a drop-in replacement for the standard CAssetManager, but rather a new system for managing your assets. This was made specifically for [getmantis.com](http://www.getmantis.com), which is hosted on Heroku. The problem with hosting Yii on Heroku (or on Amazon EC2) is that there is no persistent filesystem. (You can read about my first attempt to solve this problem [here](http://aaronfrancis.com/blog/2013/4/9/some-thoughts-about-hosting-yii-on-heroku).) Because there is no persistent filesystem, we can't rely on Yii's publishing mechanism because they could disappear at anytime. So this moves us to publishing our assets to Amazon S3, which is fine, because that's where they should be anyway. Uploading all your assets to S3 will likely take a long time, so we'd rather do that locally than rely on the webserver to do it. That way when we push our latest code live, all the assets are already published and ready to go.
 
@@ -79,5 +79,14 @@ Since the asset URLs are always changing, we need a way to reference them consis
 
 #### Referencing in CSS
 You'll likely need access to your assets in your CSS code too. Mantis will process all your CSS files and look for references in the format of ```{{asset("/original/path/to/asset.png")}}```. Mantis will then replace that template with ```"/1/s2sd345/asset.png"```.
+
+-----------
+### Credits
+
+The S3 Asset Manager used here is a heavily modified version of the [Yii-S3AssetManager](https://github.com/andremetzen/yii-s3assetmanager), which makes use of the [ES3 extension](http://www.yiiframework.com/extension/es3), which I leave unmodified.
+
+To minify the CSS, I've used an unmodified version of [minify](https://github.com/mrclay/minify).
+
+To minify the JS, I've used an unmodified version of [JShrink](https://github.com/tedivm/JShrink).
 
 
