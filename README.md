@@ -77,6 +77,10 @@ Once you have everything set up, you invoke Mantis from the command line using `
 
 If you have to, you can kill all the cache files by running ```$ ./yiic mantis reset```. *Note:* this doesn't delete your files, it just kills the cache that holds the reference to the files. You'll have to delete the files yourself.
 
+--------------
+### Watching Files Locally
+If you are working locally, you can run the ```$ ./yiic mantis watch``` command to continuously publish your files. It suppresses all console messages except warnings and notifications of updated files. Useful for when files are changing rapidly.
+
 ---------------
 ### Referencing
 Since the asset URLs are always changing, we need a way to reference them consistently. We're going to hook into the Controller to do this. I've created a ```Controller``` class that all my controllers inherit from. Then I can use my assests by calling ```$this->asset()```. For example, in a view we just call ```<img src="<?php $this->asset("/original/path/to/asset.png") ?>" />``` and it'll turn into something like ```<img src="/1/s2sd345/asset.png" />```, which is the most current version of our ```asset.png```. 
