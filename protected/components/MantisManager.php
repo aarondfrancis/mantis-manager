@@ -21,6 +21,7 @@ class MantisManager extends CApplicationComponent {
 	private $_cacheFolder;
 	private $_cache;
 	private $_run;
+	private $_watch = false;
 
 	public function init(){
 		$this->consoleEcho("Mantis Manager engaged \r\n", "0;35");
@@ -53,12 +54,14 @@ class MantisManager extends CApplicationComponent {
 		$this->setType($this->type);
 	}
 
-	public function consoleEcho($msg, $color=null){
+	public function consoleEcho($msg, $color=null, $showOnWatch=false){
 		if(Yii::app() instanceof CConsoleApplication){
-			if(!is_null($color)){
-				echo "\033[{$color}m" . $msg . "\033[0m";
-			}else{
-				echo $msg;
+			if(!$this->_watch || ($this->_watch && $showOnWatch)){
+				if(!is_null($color)){
+					echo "\033[{$color}m" . $msg . "\033[0m";
+				}else{
+					echo $msg;
+				}
 			}
 		}
 	}
@@ -145,8 +148,8 @@ class MantisManager extends CApplicationComponent {
 
 		// check to see if the file has changed
 		if($fileCache['sha'] !== sha1_file($src)){
-			$this->consoleEcho("Updating ", "0;32");
-			$this->consoleEcho($file->getFileName() . " \r\n");
+			$this->consoleEcho("Updating ", "0;32", true);
+			$this->consoleEcho($file->getFileName() . " \r\n", null, true);
 
 			$fileCache['ver'] = $fileCache['ver']+1;
 			$fileCache['sha'] = sha1_file($src);
@@ -194,7 +197,7 @@ class MantisManager extends CApplicationComponent {
 					}
 
 					if(!realpath($match)){
-						$this->consoleEcho("\r\nWarning! While processing $filename, a referenced asset was not found: $match.  \r\n \r\nAborting....\r\n \r\n","0;31");						
+						$this->consoleEcho("\r\nWarning! While processing $filename, a referenced asset was not found: $match.  \r\n \r\nAborting....\r\n \r\n","0;31", true);						
 						Yii::app()->end();
 					}
 					$match = array(
@@ -232,7 +235,7 @@ class MantisManager extends CApplicationComponent {
 			// or if it hasn't been updated on this run, process it
 			if(!array_key_exists($dependency['real'], $cache) || $cache[$dependency['real']]['run'] !== $this->_run){
 				if($i == 200){
-					$this->consoleEcho("\r\n \r\nError: Entered into an infinite asset reference loop. \r\n\r\n");
+					$this->consoleEcho("\r\n \r\nError: Entered into an infinite asset reference loop. \r\n\r\n", null, true);
 					Yii::app()->end();
 				}
 				$i++;
@@ -254,24 +257,51 @@ class MantisManager extends CApplicationComponent {
 			mkdir($dir, 0755, true);			
 		}
 
-		$ext = pathinfo($src->getPathName(), PATHINFO_EXTENSION);
-
-		if($ext == "css" && $this->css['minify']){
-			$this->consoleEcho("Minifying ", "0;32");
-			$this->consoleEcho($src->getFileName() . "\r\n");			
-			$contents = $this->minifyCSS($contents);	
-		} 
-		if($ext == "js" && $this->js['minify']){
-			$this->consoleEcho("Minifying ", "0;32");
-			$this->consoleEcho($src->getFileName() . "\r\n");			
-			$contents = $this->minifyJS($contents);		
-		} 
+		if($this->needsMinifying($src)) $contents = $this->minify($src, $contents);
 
 
 		file_put_contents($src, $contents);
 
 		$this->publishFile($file, $src);
 	}
+
+	private function needsMinifying($src){
+		$ext = pathinfo($src->getPathName(), PATHINFO_EXTENSION);
+
+		if($ext != "css" && $ext != "js") return false;
+
+		// do not minify files with .min. in the name. 
+		// eg: bootstrap.min.js
+		if(strpos($src->getFileName(), ".min.") !== false){
+			$this->consoleEcho("Minify Skipped ", "0;31");
+			$this->consoleEcho($src->getFileName() . "\r\n");
+			return false;
+		}
+
+		if($ext == "css" && !$this->css['minify']) return false;
+		if($ext == "js" && !$this->js['minify']) return false;
+
+		return true;
+
+			
+	}
+
+	private function minify($src, $contents){
+		$ext = pathinfo($src->getPathName(), PATHINFO_EXTENSION);
+		if($ext == "css"){
+			$this->consoleEcho("Minifying ", "0;32");
+			$this->consoleEcho($src->getFileName() . "\r\n");			
+			$contents = $this->minifyCSS($contents);
+		}
+
+		if($ext == "js"){
+			$this->consoleEcho("Minifying ", "0;32");
+			$this->consoleEcho($src->getFileName() . "\r\n");			
+			$contents = $this->minifyJS($contents);		
+		}
+
+		return $contents;
+	}	
 
 	private function testIgnored($file){
 		if(is_dir($file)) return true;

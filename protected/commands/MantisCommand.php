@@ -1,9 +1,5 @@
 <?php
 
-/**
- * 
- */
-
 class MantisCommand extends CConsoleCommand {
 	public function actionIndex($type='local'){
 		if($type !== 'local' && $type !== 'remote'){
@@ -25,5 +21,10 @@ class MantisCommand extends CConsoleCommand {
 		$mantisManager = Yii::app()->mantisManager;
 		$mantisManager->setType($type);
 		$mantisManager->reset();
+	}
+
+	public function actionWatch(){
+		$mantisManager = Yii::app()->mantisManager;
+		$mantisManager->watch();
 	}
 }
