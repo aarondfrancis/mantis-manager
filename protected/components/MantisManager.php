@@ -106,14 +106,14 @@ class MantisManager extends CApplicationComponent {
 		$path = Yii::getPathOfAlias($this->assetsPath);
 		$currentFiles = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
 
-		// loop through every file in the assets folder and check to see if 
+		// loop through every file in the assets folder and check to see if
 		// any of them need to be published
 	    foreach($currentFiles as $file) {
 	    	if($this->testIgnored($file)){
 	    		$this->consoleEcho("Ignored ", "0;31");
 	    		$this->consoleEcho($file->getFileName() . "\r\n");
-		    	continue;	
-	    	} 
+		    	continue;
+	    	}
 			$ext = pathinfo($file->getPathName(), PATHINFO_EXTENSION);
 
 			if($ext == "css" || $ext == "js"){
@@ -127,7 +127,6 @@ class MantisManager extends CApplicationComponent {
 	    $this->processProcessQueue();
 	    $this->combineFiles();
 
-	    // print_r($this->_cache);
 	}
 
 	private function publishFile($file, $src=null){
@@ -138,10 +137,10 @@ class MantisManager extends CApplicationComponent {
 
 		if(!array_key_exists($relative, $cache)){
 			$fileCache = array(
-				'sha'=>'getmantis.com', 
+				'sha'=>'getmantis.com',
 				'ver'=>$this->startVersion,
 				'run'=>0
-			);	
+			);
 		}else{
 			$fileCache = $cache[$relative];
 		}
@@ -197,12 +196,12 @@ class MantisManager extends CApplicationComponent {
 					}
 
 					if(!realpath($match)){
-						$this->consoleEcho("\r\nWarning! While processing $filename, a referenced asset was not found: $match.  \r\n \r\nAborting....\r\n \r\n","0;31", true);						
+						$this->consoleEcho("\r\nWarning! While processing $filename, a referenced asset was not found: $match.  \r\n \r\nAborting....\r\n \r\n","0;31", true);
 						Yii::app()->end();
 					}
 					$match = array(
 						'asEntered' => $asEntered,
-						'real' => realpath($match)
+						'real' => str_replace($this->_assetsPath, "", realpath($match))
 					);
 
 				}
@@ -254,7 +253,7 @@ class MantisManager extends CApplicationComponent {
 		$dir = $src->getPath();
 
 		if (!is_dir($dir)) {
-			mkdir($dir, 0755, true);			
+			mkdir($dir, 0755, true);
 		}
 
 		if($this->needsMinifying($src)) $contents = $this->minify($src, $contents);
@@ -270,7 +269,7 @@ class MantisManager extends CApplicationComponent {
 
 		if($ext != "css" && $ext != "js") return false;
 
-		// do not minify files with .min. in the name. 
+		// do not minify files with .min. in the name.
 		// eg: bootstrap.min.js
 		if(strpos($src->getFileName(), ".min.") !== false){
 			$this->consoleEcho("Minify Skipped ", "0;31");
@@ -283,32 +282,32 @@ class MantisManager extends CApplicationComponent {
 
 		return true;
 
-			
+
 	}
 
 	private function minify($src, $contents){
 		$ext = pathinfo($src->getPathName(), PATHINFO_EXTENSION);
 		if($ext == "css"){
 			$this->consoleEcho("Minifying ", "0;32");
-			$this->consoleEcho($src->getFileName() . "\r\n");			
+			$this->consoleEcho($src->getFileName() . "\r\n");
 			$contents = $this->minifyCSS($contents);
 		}
 
 		if($ext == "js"){
 			$this->consoleEcho("Minifying ", "0;32");
-			$this->consoleEcho($src->getFileName() . "\r\n");			
-			$contents = $this->minifyJS($contents);		
+			$this->consoleEcho($src->getFileName() . "\r\n");
+			$contents = $this->minifyJS($contents);
 		}
 
 		return $contents;
-	}	
+	}
 
 	private function testIgnored($file){
 		if(is_dir($file)) return true;
 		foreach($this->ignore as $ignore){
 			if ((bool) preg_match('/^' . $ignore . '$/i', $file)){
-				return true;	
-			} 
+				return true;
+			}
 		}
 		return false;
 	}
@@ -317,9 +316,9 @@ class MantisManager extends CApplicationComponent {
 		$combine = array_merge($this->css['combine'], $this->js['combine']);
 		foreach($combine as $filename=>$files){
 			$this->consoleEcho("Combining ", "0;32");
-			$this->consoleEcho("for " . $this->_assetsPath . '/' . $filename . "\r\n");	
+			$this->consoleEcho("for " . $this->_assetsPath . '/' . $filename . "\r\n");
 			$content = $this->combine($files);
-			
+
 			$ext = pathinfo($filename, PATHINFO_EXTENSION);
 
 			if($ext == "css" && $this->css['minify']){
@@ -346,8 +345,8 @@ class MantisManager extends CApplicationComponent {
 		$content = "";
 		foreach($files as $file){
 			$this->consoleEcho("Adding ", "0;32");
-			$this->consoleEcho($file . "\r\n");	
-			$content .= file_get_contents($this->_assetsPath . '/' . $file);
+			$this->consoleEcho($file . "\r\n");
+			$content .= file_get_contents($this->_cacheFolder . '/' . $file);
 		}
 		return $content;
 	}
